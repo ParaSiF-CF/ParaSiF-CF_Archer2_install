@@ -16,7 +16,7 @@ Load modules and set python paths/build paths
   export PATH=$PYTHONUSERBASE/bin:$PATH
   #pip install --user virtualenv
   virtualenv --version
-  virtualenv fenics2019_eCSE_FSI
+  virtualenv --system-site-packages fenics2019_eCSE_FSI
   #cp -r source/ fenics2019_eCSE_FSI/source
 
   BUILD_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0
@@ -80,8 +80,6 @@ Download, configure, and install mpi4py
 ```bash
 . fenics2019_eCSE_FSI/bin/activate
 pip install pkgconfig
-pip install mpi4py
-pip install Cython
 pip install h5py==3.0.0rc1
 ```
 
@@ -94,7 +92,7 @@ Download, configure, and install hdf5-1.10.7
   tar -xvf hdf5-1.10.7.tar.gz
   cd hdf5-1.10.7
   ./configure \
-  --prefix=$BUILD_DIR/boost/hdf5-1.10.7 \
+  --prefix=$BUILD_DIR/boost/hdf5-1.10.7_install \
   CC=cc \
   CFLAGS=-O3 \
   CXX=CC \
@@ -105,8 +103,8 @@ Download, configure, and install hdf5-1.10.7
   
   make
   make install
-  export LD_LIBRARY_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/lib:$LD_LIBRARY_PATH
-  export LD_RUN_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/lib:$LD_RUN_PATH
+  export LD_LIBRARY_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  export LD_RUN_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
 ```
 
 
@@ -140,31 +138,49 @@ L21
   export PATH=$PATH:/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/superlu_dist-6.1.1/SRC
   export PATH=$PATH:/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/scotch_6.0.10/include
   export PATH=$PATH:/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/MUMPS_5.2.1/include
-  export PATH=$PATH:/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/include
+  export PATH=$PATH:/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include
   export PATH=$PATH:/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/boost/include
- export LD_LIBRARY_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/lib:$LD_LIBRARY_PATH
-  export LD_RUN_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/lib:$LD_RUN_PATH
-  export HDF5_INCLUDE_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/include
+ export LD_LIBRARY_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  export LD_RUN_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
+  export HDF5_INCLUDE_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include
   cd ..
 ```
 
 Download, configure, and install PETSc
 ---------------------------------------
-go to sh/petsc.sh
-L10
-+++  3.11.4:006177b4059cd40310a3e9a4bf475f3a8c276b62d8cca4df272ef88bdfc2f83a
-L62
-+++ #fn_check_includes HDF5 hdf5.h
-L205
-+++   --with-hdf5=0 \\
+# go to sh/petsc.sh
+# L10
+# +++  3.11.4:006177b4059cd40310a3e9a4bf475f3a8c276b62d8cca4df272ef88bdfc2f83a
+# L62
+# +++ #fn_check_includes HDF5 hdf5.h
+# L205
+# +++   --with-hdf5=0 \\
+
+# ```bash
+  # cd  boost
+  # ./sh/petsc.sh --prefix=$(pwd)/boost
+  # cd ..
+  # export PETSC_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4 
+  # export PETSC_ARCH=x86-rome
+# ```
+
+
 
 ```bash
   cd  boost
-  ./sh/petsc.sh --prefix=$(pwd)/boost
+  wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.11.4.tar.gz
+  tar xf petsc-3.11.4.tar.gz
+  cd petsc-3.11.4
+  cp ../../INSTALL_PETSC.sh ./
+  chmod +x INSTALL_PETSC.sh
+  ./INSTALL_PETSC.sh
+  make PETSC_DIR=`pwd` all
+  make PETSC_DIR=`pwd` install
   cd ..
-  export PETSC_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4 
-  export PETSC_ARCH=x86-rome
+  export PETSC_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4
+  export PETSC_ARCH=arch-linux-c-opt
 ```
+
 Download, configure, and install PETSc4py
 ---------------------------------------
 ```bash
@@ -201,10 +217,16 @@ Download DOLFIN, and make sure that all dependencies are correct:
   export EIGEN3_INCLUDE_DIR=$BUILD_DIR/eigen-3.3.9/build/build/include/eigen3
   export SCOTCH_DIR=$BUILD_DIR/boost/boost
   
- export LD_LIBRARY_PATH=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/HDF5/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
-  export LD_RUN_PATH=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/HDF5/hdf5-1.10.7_install/lib:$LD_RUN_PATH
-  export HDF5_INCLUDE_DIR=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/HDF5/hdf5-1.10.7_install/include
-  export PETSC_DIR=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/PETSC/petsc-3.11.4 
+ #export LD_LIBRARY_PATH=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/HDF5/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  #export LD_RUN_PATH=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/HDF5/hdf5-1.10.7_install/lib:$LD_RUN_PATH
+  #export HDF5_INCLUDE_DIR=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/HDF5/hdf5-1.10.7_install/include
+  #export PETSC_DIR=/work/c01/c01/shared/vcz18385/SOFTWARE/GNU/10.1.0/PETSC/petsc-3.11.4 
+  #export PETSC_ARCH=arch-linux-c-opt  
+  
+ export LD_LIBRARY_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  export LD_RUN_PATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
+  export HDF5_INCLUDE_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include
+  export PETSC_DIR=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4
   export PETSC_ARCH=arch-linux-c-opt
 
 ```
@@ -236,12 +258,13 @@ Run CMake:
   -DDOLFIN_USE_PYTHON3=true \
   -DDOLFIN_ENABLE_PETSC=true \
   -DPETSC_DIR="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4" \
-  -DPETSC_LIBRARY="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4/x86-rome/lib/libpetsc.a" \
+  -DPETSC_LIBRARY="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4/arch-linux-c-opt/lib/libpetsc.so" \
   -DDOLFIN_SKIP_BUILD_TESTS=true \
   -DCMAKE_REQUIRED_LIBRARIES="-lmpifort" \
   -DCMAKE_CXX_FLAGS_RELEASE="-Wno-literal-suffix -O3 -DNDEBUG" \
-  -DHDF5_ROOT="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7" \
-  -DHDF5_INCLUDE_DIRS="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7/include" \
+  -DHDF5_ROOT="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install" \
+  -DHDF5_INCLUDE_DIRS="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include" \
+  -DPTESMUMPS_LIBRARY="/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/petsc-3.11.4/install/lib/libptesmumps.a" \
   ..
 
   make -j 8 install
