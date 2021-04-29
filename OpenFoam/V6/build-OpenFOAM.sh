@@ -35,6 +35,17 @@ rm -r MUI
 # ln -s /work/c01/c01/wendiliu/app/MUI/v1.0_dev ./MUI
 cd ..
 
+#change etc/bashrc
+# L47
+# +++ export FOAM_INST_DIR=/work/c01/c01/wendiliu/app/OpenFoam/V6/install/$WM_PROJECT
+#
+# L108
+# +++ /work/c01/c01/wendiliu/app/OpenFoam/V6/install/$WM_PROJECT/$USER $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
+#
+# L132
+# +++ export WM_PROJECT_USER_DIR=/work/c01/c01/wendiliu/app/OpenFoam/V6/install/$WM_PROJECT/$USER-$WM_PROJECT_VERSION
+
+
 sbatch --account=c01-eng ./site/q-compile.sh
 
 

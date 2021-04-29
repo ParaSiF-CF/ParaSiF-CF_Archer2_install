@@ -274,11 +274,31 @@ Run CMake:
 
 Build python build
 
-```
+```bash
   cd ../python
   export pybind11_DIR=$BUILD_DIR/pybind11-2.6.1/build//share/cmake/pybind11/
   export DOLFIN_DIR=$BUILD_DIR/dolfin/build/share/dolfin/cmake
   python3 setup.py install
+```
+
+Download, configure, and install mshr
+---------------------------------------
+```bash
+ module load gmp/6.1.2-gcc10
+ cd $BUILD_DIR
+ wget https://bitbucket.org/fenics-project/mshr/downloads/mshr-2019.1.0.tar.gz
+ tar -xzf mshr-2019.1.0.tar.gz
+ mkdir mshr-2019.1.0/build   && cd mshr-2019.1.0/build   
+
+ cmake -DCMAKE_INSTALL_PREFIX=$(pwd) \
+ -DPYTHON_EXECUTABLE:FILEPATH=$BUILD_DIR/fenics2019_eCSE_FSI/bin/python3 \
+ .. 
+ 
+ make install 
+ cd ../..
+ cd mshr-2019.1.0/python   
+ python3 setup.py install
+ cd ../..
 ```
 
 > ## Note for running
