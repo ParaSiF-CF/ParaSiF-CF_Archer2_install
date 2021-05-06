@@ -1,0 +1,70 @@
+COMPILER ?= GCC
+CC	= CC
+CFLAGS	= -Wall -std=c++11 -O3
+LDFLAGS = -shared
+USE_RBF = True
+include $(COMPILER).make
+INC_MPI4PY = -I$(shell python3 -c "import mpi4py;print(mpi4py.get_include())")
+INC_PYBIND = -I/opt/cray/pe/python/3.8.5.0/include/python3.8 -I/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/pybind11-2.6.1/include -I/opt/cray/pe/python/3.8.5.0/include/python3.8
+INC_MUI = -I/work/c01/c01/wendiliu/app/MUI/MUI-1.1
+INC_TPARTY =-I/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/eigen-3.3.9/build/build/include/eigen3
+CC_VERSION_STR = '"$(shell $(CC) --version | head -n 1)"'
+MPI_VERSION_STR = '"$(shell bash mpi_version.sh)"'
+CC_CONFIG_STR = '"$(shell $(CC) -show) $(CFLAGS) $(INC_MPI4PY) $(INC_PYBIND)"'
+PYTHON_INT_SIZE = $(shell python3 -c "import numpy; print(str(numpy.iinfo(int).dtype)[-2:])")
+ifeq ($(PYTHON_INT_SIZE),64)
+	CFLAGS_D=-DPYTHON_INT_64
+else ifeq ($(PYTHON_INT_SIZE),32)
+	CFLAGS_D = -DPYTHON_INT_32
+endif
+CFLAGS_D += -DCOMPILER_VERSION_STR=$(CC_VERSION_STR) -DMPI_VERSION_STR=$(MPI_VERSION_STR) -DCOMPILER_CONFIG_STR=$(CC_CONFIG_STR) -DPYTHON_BINDINGS
+ifeq ($(USE_RBF),True)
+    CFLAGS += -fpermissive
+    INC_TPARTY += -I/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/eigen-3.3.9/build/build/include/eigen3
+    CFLAGS_D +=  -DUSE_RBF
+endif
+EXTENSION_SUFFIX = $(shell python3-config --extension-suffix)
+TARGET_LIB = mui4py/mui4py_mod$(EXTENSION_SUFFIX)
+SRCS = mui4py/mui4py.cpp
+OBJS = $(SRCS:.cpp=.o)
+
+.PHONY: mui4py_mod
+none:
+	@echo "No default Makefile option. Choose from: 'mui4py_mod', 'package', 'meta-package', 'clean-all', 'clean-package', 'clean-mod' or 'pip-install'."
+
+mui4py_mod: $(TARGET_LIB)
+
+$(TARGET_LIB): $(OBJS)
+	$(CC) $(LDFLAGS) $(INC_MUI) $^ -o $@
+
+%.o: %.cpp
+	$(CC) -c $(CFLAGS) $(CFLAGS_D) $(INC_MPI4PY) $(INC_PYBIND) $(INC_MUI) $(INC_TPARTY) $< -o $@
+
+.PHONY: package meta-package clean-package clean-mod clean-all install pip-install clean-obj
+package: mui4py_mod
+	@python setup.py sdist
+	rm -rf mui4py.egg-info
+
+meta-package:
+	@ echo "Not implemented yet."
+
+clean-package:
+	rm -rf mui4py.egg-info
+	rm -rf dist
+	rm -rf build
+
+clean-mod:
+	rm -f $(TARGET_LIB)
+	rm -rf mui4py/__pycache__
+
+clean-obj:
+	rm -f mui4py/*.o
+
+clean-all: clean-package clean-mod clean-obj
+
+install:
+	@python setup.py install
+
+pip-install:
+	@pip install dist/mui4py*.tar.gz
+
