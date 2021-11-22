@@ -7,5 +7,5 @@ Step Two: install MUI wrappers
 	go to MUI/ subfolder and compile MUI Python & C wrappers and MUI-util Python & C wrappers.
 	
 Step Three: install Code_Saturne
-
+	please refer to the link for CS installation: https://docs.archer2.ac.uk/research-software/code-saturne/code-saturne/
 

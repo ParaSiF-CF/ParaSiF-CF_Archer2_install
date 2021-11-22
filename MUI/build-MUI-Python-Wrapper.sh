@@ -35,6 +35,8 @@ make pip-install
 cd $INSTALL_DIR/MUI-1.1.3/wrappers/C
 sed -i '2s/mpicc/cc/' Makefile
 sed -i '3s/mpic++/CC/' Makefile
+sed -i '22s/libmui_c_wrapper.so/libmui_c_wrapper.so mui_c_wrapper_general.o/' Makefile
+sed -i '23s/libmui_c_wrapper.a/libmui_c_wrapper.a mui_c_wrapper_general.o/' Makefile
 sed -i '25s/${CC}/#${CC}/' Makefile
 sed -i '27s/${MPI}/#${MPI}/' Makefile
 make

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+INSTALL_FOLDER=/work/c01/c01/wendiliu/app_test
+cd ${INSTALL_FOLDER}/code_saturne/V6.0.6
+
 #################################
 ## Which version of the code ? ##
 #################################
@@ -43,8 +46,8 @@ KEROPT=$INSTALLPATH/$KERNAME/arch/$NOM_ARCH
 
 export KEROPT
 
-PARMETISPATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/parmetis-4.0.3
-PTSCOTCHPATH=/work/c01/c01/wendiliu/app/FEniCS/V2019.1.0/boost/scotch_6.0.10
+PARMETISPATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/parmetis-4.0.3
+PTSCOTCHPATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/scotch_6.1.0
 
 mkdir -p $KERBUILD
 cd $KERBUILD
@@ -82,5 +85,5 @@ CXXFLAGS="-O3"
 
 cd $INSTALLPATH
 ###rm -rf $INSTALLPATH/Kernel/ncs-${KER_VERSION}.build
-export PATH=/work/c01/c01/wendiliu/app/code_saturne/V6.0.6/code_saturne-6.0.6/arch/Linux/bin:$PATH
+export PATH=${INSTALL_FOLDER}/code_saturne/V6.0.6/code_saturne-6.0.6/arch/Linux/bin:$PATH
 
