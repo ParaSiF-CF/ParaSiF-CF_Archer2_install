@@ -4,4 +4,8 @@ Step One: installation on FEniCS
 	go to FEniCS/V2019.1.0 subfolder and install FEniCS followed by the instruction provided by FEniCS_2019.1.0.md
 	
 Step Two: install MUI wrappers
+	go to MUI/ subfolder and compile MUI Python & C wrappers and MUI-util Python & C wrappers.
+	
+Step Three: install Code_Saturne
+
 

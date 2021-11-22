@@ -50,3 +50,8 @@ cp "${patch_file_util}" $INSTALL_DIR/MUI_Utilities-main/fsiCouplingLab/wrappers/
 cd $INSTALL_DIR/MUI_Utilities-main/fsiCouplingLab/wrappers/Python
 make package
 make pip-install
+
+cd $INSTALL_DIR/MUI_Utilities-main/fsiCouplingLab/wrappers/C
+sed -i '4s/=/=..\/..\/..\/..\/MUI-1.1.3/' Makefile_CAPI
+sed -i '9s/-I/-I..\/..\/..\/..\/..\/FEniCS\/V2019.1.0\/eigen-3.3.9\/build\/build\/include\/eigen3/' Makefile_CAPI
+make -f Makefile_CAPI
