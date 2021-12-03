@@ -1,11 +1,11 @@
-This folder contains the instruction for the installation of FEniCS, Code_Saturne, MUI and OpenFOAM in Archer2
+This folder contains the instructions for the installation of FEniCS, Code_Saturne and MUI on ARCHER2.
 
-Step One: installation on FEniCS
-	go to FEniCS/V2019.1.0 subfolder and install FEniCS followed by the instruction provided by FEniCS_2019.1.0.md
+Step One: installation of FEniCS
+	go to FEniCS/V2019.1.0 subfolder and install FEniCS following the instructions provided by FEniCS_2019.1.0.md
 	
-Step Two: install MUI wrappers
+Step Two: installation of MUI wrappers
 	go to MUI/ subfolder and compile MUI Python & C wrappers and MUI-util Python & C wrappers.
 	
-Step Three: install Code_Saturne
+Step Three: installation of Code_Saturne
 	please refer to the link for CS installation: https://docs.archer2.ac.uk/research-software/code-saturne/code-saturne/
 
