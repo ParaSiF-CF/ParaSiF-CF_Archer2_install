@@ -3,42 +3,58 @@ Instructions for compiling FEniCS 2019.1.0 for ARCHER2
 
 These instructions are for compiling FEniCS 2019.1.0 on 
 [ARCHER2](https://www.archer2.ac.uk).
-FEniCS 2019.1.0 requires the following software to be installed:
+FEniCS 2019.1.0 is installed with the following software:
 ```bash
+  -GNU: 10.2.0
+  -python: 3.8.5
+  -cmake: 3.21.3
+
   -PYBIND11: v2.6.1
   -boost: v1.72.0
-  -glm: v0.9.9.6
+  -EIGEN: v3.3.9
+  -pkgconfig: v1.5.5
   -hdf5: v1.10.7
-  -hypre: v2.18.0
-  -matio: v1.5.18
-  -metis: v5.1.0
-  -MUMPS: v5.3.5
-  -parmetis: v4.0.3
   -petsc: v3.11.4
+    -glm: v0.9.9.6
+    -hypre: v2.18.0
+    -matio: v1.5.18
+    -superlu: v5.2.2
+    -superlu-dist: v6.4.0
+    -metis: v5.1.0
+    -MUMPS: v5.3.5
+    -parmetis: v4.0.3
+    -scotch: v6.1.0
+
   -petsc4py: v3.11.0
-  -scotch: v6.1.0
 ```
 
-Set installation folder
+Create and set the installation and build folders
 ---------------------------------------------
 ```bash
   export INSTALL_FOLDER=`pwd`
-  cd ${INSTALL_FOLDER}/FEniCS/V2019.1.0
+  mkdir ${INSTALL_FOLDER}/FEniCS
+  mkdir ${INSTALL_FOLDER}/FEniCS/V2019.1.0
+
+  export BUILD_DIR=${INSTALL_FOLDER}/FEniCS/V2019.1.0
 ```
 
 Load modules and set python paths/build paths
 ---------------------------------------------
 
 ```bash
+  module load PrgEnv-gnu
   module load cray-python
   module load cmake
+
+  cd $BUILD_DIR
+
   export PYTHONUSERBASE=${INSTALL_FOLDER}/.local
   export PATH=$PYTHONUSERBASE/bin:$PATH
+
   pip install --user virtualenv
   virtualenv --version
   virtualenv --system-site-packages fenics2019_eCSE_FSI
 
-  export BUILD_DIR=${INSTALL_FOLDER}/FEniCS/V2019.1.0
   export PATH=$PATH:$BUILD_DIR/bin
   export PATH=$PATH:$BUILD_DIR/shared/bin
   export PYTHONPATH=$PYTHONPATH:$BUILD_DIR/lib/python3.8/site-packages
@@ -47,7 +63,7 @@ Load modules and set python paths/build paths
   export CXX=CC
 ```
 
-Download, configure, and build pybind
+Download, configure and build pybind
 -------------------------------------
 
 ```bash
@@ -61,7 +77,7 @@ Download, configure, and build pybind
   make install
 ```
 
-Download, configure, and install BOOST
+Download, configure and prepare BOOST
 --------------------------------------
 
 While BOOST is available centrally on ARCHER2, the shared libraries are not 
@@ -76,9 +92,10 @@ script provided by the ARCHER2 CSE team.
   git checkout cse-develop
   sed -i 's/make_shared=0/make_shared=1/g' sh/.preamble.sh
   ./sh/boost.sh --prefix=$(pwd)/boost
+  #if there is a problem here, download boost_1_72_0.tar.bz2 directly, and retype the previous command
 ```
 
-Download, configure, and install EIGEN
+Download, configure and install EIGEN
 --------------------------------------
 
 ```bash
@@ -91,7 +108,7 @@ Download, configure, and install EIGEN
   make -j 8 install
 ```
 
-Download, configure, and install mpi4py
+Download, configure and install mpi4py
 ---------------------------------------------------------
 
 ```bash
@@ -101,8 +118,8 @@ Download, configure, and install mpi4py
   pip install h5py==3.0.0rc1
 ```
 
-Download, configure, and install hdf5-1.10.7
---------------------------------------
+Download, configure and install hdf5
+-------------------------------------
 
 ```bash
   cd $BUILD_DIR
@@ -110,6 +127,8 @@ Download, configure, and install hdf5-1.10.7
   wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.7/src/hdf5-1.10.7.tar.gz
   tar zxvf hdf5-1.10.7.tar.gz
   cd hdf5-1.10.7
+
+  ######### Note that this is one command split in several lines
   ./configure \
   --prefix=$BUILD_DIR/boost/hdf5-1.10.7_install \
   CC=cc \
@@ -119,15 +138,16 @@ Download, configure, and install hdf5-1.10.7
   --enable-cxx \
   --enable-parallel \
   --enable-unsupported
-  
-  make
+  #########
+
+  make -j 8
   make install
-  export LD_LIBRARY_PATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
-  export LD_RUN_PATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
+  export LD_LIBRARY_PATH=${BUILD_DIR}/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  export LD_RUN_PATH=${BUILD_DIR}/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
 ```
 
 
-Download, configure, and install FEniCS python components
+Download, configure and install FEniCS python components
 ---------------------------------------------------------
 
 ```bash
@@ -139,32 +159,33 @@ Download, configure, and install FEniCS python components
 ```
 
 
-Download, configure, and install metis
+Download, configure and install prerequisites for PETSc
 ---------------------------------------------------------
 
-modify ${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/sh/tpsl.sh
-L21
---- printf "%s\n" glm hypre matio metis scotch parmetis mumps sundials superlu superlu-dist \
-+++ printf "%s\n" glm hypre matio metis scotch parmetis mumps superlu superlu-dist \
+The "sundials" library is not required by the coupling, and is therefore not installed. As it is accounted for by default, Line 21 (L21) of tpsl.sh, to be found as `${BUILD_DIR}/boost/sh/tpsl.sh` has to be changed from
+
+printf "%s\n" glm hypre matio metis scotch parmetis mumps sundials superlu superlu-dist \
+to
+printf "%s\n" glm hypre matio metis scotch parmetis mumps superlu superlu-dist \
 
 ```bash
   cd $BUILD_DIR
   cd  boost
   ./sh/tpsl.sh --prefix=$(pwd)/boost
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/metis-5.1.0/include
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/parmetis-4.0.3/include
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/superlu-5.2.1/SRC
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/superlu_dist-6.1.1/SRC
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/scotch_6.0.10/include
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/MUMPS_5.3.5/include
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include
-  export PATH=$PATH:${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/boost/include
-  export LD_LIBRARY_PATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
-  export LD_RUN_PATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
-  export HDF5_INCLUDE_DIR=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include
+  export PATH=$PATH:${BUILD_DIR}/boost/metis-5.1.0/include
+  export PATH=$PATH:${BUILD_DIR}/boost/parmetis-4.0.3/include
+  export PATH=$PATH:${BUILD_DIR}/boost/superlu-5.2.2/SRC
+  export PATH=$PATH:${BUILD_DIR}/boost/superlu_dist-6.4.0/SRC
+  export PATH=$PATH:${BUILD_DIR}/boost/scotch_6.1.0/include
+  export PATH=$PATH:${BUILD_DIR}/boost/MUMPS_5.3.5/include
+  export PATH=$PATH:${BUILD_DIR}/boost/hdf5-1.10.7_install/include
+  export PATH=$PATH:${BUILD_DIR}/boost/boost/include
+  export LD_LIBRARY_PATH=${BUILD_DIR}/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  export LD_RUN_PATH=${BUILD_DIR}/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
+  export HDF5_INCLUDE_DIR=${BUILD_DIR}/boost/hdf5-1.10.7_install/include
 ```
 
-Download, configure, and install PETSc
+Download, configure and install PETSc
 ---------------------------------------
 
 ```bash
@@ -173,16 +194,42 @@ Download, configure, and install PETSc
   wget https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.11.4.tar.gz
   tar zxvf petsc-3.11.4.tar.gz
   cd petsc-3.11.4
-  cp ../../INSTALL_PETSC.sh ./
-  chmod +x INSTALL_PETSC.sh
-  ./INSTALL_PETSC.sh
+
+  export ROOT_SHARED_DIR=${BUILD_DIR}/boost
+  ######### Note that this is one command split in several lines
+  ./configure \
+  --prefix=$ROOT_SHARED_DIR/petsc-3.11.4/install \
+  --with-mpi=1 \
+  --CC=cc \
+  --CFLAGS=-O3 \
+  --CXX=CC \
+  --CXXFLAGS=-O3 \
+  --with-cxx-dialect=C++11 \
+  --FC=ftn \
+  --FFLAGS=-O3 \
+  --enable-debug=0 \
+  --enable-shared=1 \
+  --with-precision=double \
+  --with-hdf5=0 \
+  --with-hdf5-dir=$ROOT_SHARED_DIR/hdf5-1.10.7_install \
+  --download-superlu=yes \
+  --download-superlu_dist=yes \
+  --download-metis=yes \
+  --download-parmetis=yes \
+  --download-ptscotch=yes \
+  --with-scalapack=1 \
+  --with-mumps=1 \
+  --with-mumps-include="${BUILD_DIR}/boost/MUMPS_5.3.5/include" \
+  --with-mumps-lib="-L${BUILD_DIR}/boost/MUMPS_5.3.5/lib -lcmumps -ldmumps -lesmumps -lsmumps -lzmumps -lmumps_common -lptesmumps -lesmumps -lpord"
+  ######### 
+
   make PETSC_DIR=`pwd` all
   make PETSC_DIR=`pwd` install
-  export PETSC_DIR=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/petsc-3.11.4
+  export PETSC_DIR=${BUILD_DIR}/boost/petsc-3.11.4
   export PETSC_ARCH=arch-linux-c-opt
 ```
 
-Download, configure, and install PETSc4py
+Download, configure and install PETSc4py
 ---------------------------------------
 ```bash
   cd $BUILD_DIR
@@ -192,23 +239,25 @@ Download, configure, and install PETSc4py
   cd petsc4py-3.11.0
 ```
 
-go to src/PETSc/cyclicgc.pxi
+In order to continue the installation, some lines have to be erased from the file `src/PETSc/cyclicgc.pxi`. So, after editing it, Lines 27 and 28 (L27 and L28) should be deleted first, and then Lines 17, 18 and 19 (L17, L18 and L19):
 
-	L27 -    if arg == NULL and _Py_AS_GC(d).gc_refs == 0:
-	L28 -        _Py_AS_GC(d).gc_refs = 1
+```bash
+L27:    if arg == NULL and _Py_AS_GC(d).gc_refs == 0:
+L28:        _Py_AS_GC(d).gc_refs = 1  
 
-	L17 -    ctypedef struct PyGC_Head:
-	L18 -       Py_ssize_t gc_refs"gc.gc_refs"
-	L19 -    PyGC_Head *_Py_AS_GC(PyObject*)
-
+L17:    ctypedef struct PyGC_Head:
+L18:       Py_ssize_t gc_refs"gc.gc_refs"
+L19:    PyGC_Head *_Py_AS_GC(PyObject*)
+```
+	
 ```bash
   rm -f src/petsc4py.PETSc.c
   python3 setup.py install
 ```
-Download, configure, and install DOLFIN
+Download, configure and install DOLFIN
 ---------------------------------------
 
-Download DOLFIN, and make sure that all dependencies are correct:
+Download DOLFIN, and make sure that all the dependencies are correct:
 
 ```bash
   cd $BUILD_DIR
@@ -220,15 +269,15 @@ Download DOLFIN, and make sure that all dependencies are correct:
   export EIGEN3_INCLUDE_DIR=$BUILD_DIR/eigen-3.3.9/build/build/include/eigen3
   export SCOTCH_DIR=$BUILD_DIR/boost/boost
   
-  export LD_LIBRARY_PATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
-  export LD_RUN_PATH=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
-  export HDF5_INCLUDE_DIR=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include
-  export PETSC_DIR=${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/petsc-3.11.4
+  export LD_LIBRARY_PATH=${BUILD_DIR}/boost/hdf5-1.10.7_install/lib:$LD_LIBRARY_PATH
+  export LD_RUN_PATH=${BUILD_DIR}/boost/hdf5-1.10.7_install/lib:$LD_RUN_PATH
+  export HDF5_INCLUDE_DIR=${BUILD_DIR}/boost/hdf5-1.10.7_install/include
+  export PETSC_DIR=${BUILD_DIR}/boost/petsc-3.11.4
   export PETSC_ARCH=arch-linux-c-opt
 ```
 
-At this point, we need to edit `$BUILD_DIR/dolfin/CMakeLists.txt`. We need to 
-add the following text to the top of that file:
+The file `$BUILD_DIR/dolfin/CMakeLists.txt` needs some editing to 
+add the following text to the top of the file (at Line 5 (L5)):
 
 ```bash
   SET( EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" )
@@ -237,14 +286,16 @@ add the following text to the top of that file:
   ENDIF()
   INCLUDE_DIRECTORIES ( "${EIGEN3_INCLUDE_DIR}" )
 ```
-At this point, Edit cmake/modules/FindPETSc.cmake,  near the top you should edit 
+
+The file `$BUILD_DIR/dolfin/cmake/modules/FindPETSc.cmake` needs some editing and the following line should be changed 
 
 ```bash
-  pkg_search_module(PETSC craypetsc_real PETSc) -> 
+  pkg_search_module(PETSC craypetsc_real PETSc)
+  into
   pkg_search_module(PETSC petsc PETSc)
 ```
 
-Run CMake:
+Finally, CMake is ran as follows, before the code is installed using make:
 
 ```bash
   cmake -DCMAKE_INSTALL_PREFIX=$(pwd)   \
@@ -252,18 +303,18 @@ Run CMake:
   -DDOLFIN_ENABLE_PYTHON=true \
   -DDOLFIN_USE_PYTHON3=true \
   -DDOLFIN_ENABLE_PETSC=true \
-  -DPETSC_DIR="${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/petsc-3.11.4" \
-  -DPETSC_LIBRARY="${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/petsc-3.11.4/arch-linux-c-opt/lib/libpetsc.so" \
+  -DPETSC_DIR="${BUILD_DIR}/boost/petsc-3.11.4" \
+  -DPETSC_LIBRARY="${BUILD_DIR}/boost/petsc-3.11.4/arch-linux-c-opt/lib/libpetsc.so" \
   -DDOLFIN_SKIP_BUILD_TESTS=true \
   -DCMAKE_REQUIRED_LIBRARIES="-lmpifort" \
   -DCMAKE_CXX_FLAGS_RELEASE="-Wno-literal-suffix -O3 -DNDEBUG" \
-  -DHDF5_ROOT="${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install" \
-  -DHDF5_INCLUDE_DIRS="${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/hdf5-1.10.7_install/include" \
-  -DPTESMUMPS_LIBRARY="${INSTALL_FOLDER}/FEniCS/V2019.1.0/boost/petsc-3.11.4/install/lib/libptesmumps.a" \
+  -DHDF5_ROOT="${BUILD_DIR}/boost/hdf5-1.10.7_install" \
+  -DHDF5_INCLUDE_DIRS="${BUILD_DIR}/boost/hdf5-1.10.7_install/include" \
+  -DPTESMUMPS_LIBRARY="${BUILD_DIR}/boost/petsc-3.11.4/install/lib/libptesmumps.a" \
   ..
 
   make -j 8 install
-  source ${INSTALL_FOLDER}/FEniCS/V2019.1.0/dolfin/build/share/dolfin/dolfin.conf
+  source ${BUILD_DIR}/dolfin/build/share/dolfin/dolfin.conf
 ```
 
 Build python build
