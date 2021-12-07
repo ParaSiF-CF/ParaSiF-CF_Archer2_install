@@ -16,18 +16,19 @@ Create and set the installation and build folders
   export INSTALL_FOLDER=`pwd`
   mkdir ${INSTALL_FOLDER}/MUI
 
-  export BUILD_DIR=${INSTALL_FOLDER}/MUI
+  export BUILD_DIR_MUI=${INSTALL_FOLDER}/MUI
 ```
 
 Source fenics2019_eCSE_FSI.conf
 ---------------------------------------------
 ```bash
-  source ${BUILD_DIR}/../../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
+  source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
 ```
 
 Get MUI V1.1.3
 ---------------------------------------------
 ```bash
+  cd ${BUILD_DIR_MUI}
   wget https://github.com/MxUI/MUI/archive/refs/tags/1.1.3.zip
   unzip 1.1.3.zip
   mv MUI-1.1.3 V1.1.3
@@ -36,14 +37,14 @@ Get MUI V1.1.3
 Patch Makefile of MUI Python wrapper for ARCHER2 installation
 ---------------------------------------------
 ```bash
-  patch_file=${BUILD_DIR}/patched-MUI-Python-Makefile-FSI 
-  cp "${patch_file}" ${BUILD_DIR}/V1.1.3/wrappers/Python/Makefile
+  patch_file=${BUILD_DIR_MUI}/patched-MUI-Python-Makefile-FSI 
+  cp "${patch_file}" ${BUILD_DIR_MUI}/V1.1.3/wrappers/Python/Makefile
 ```
 
 Go to the main folder of MUI Python wrapper
 ---------------------------------------------
 ```bash
-  cd ${BUILD_DIR}/V1.1.3/wrappers/Python
+  cd ${BUILD_DIR_MUI}/V1.1.3/wrappers/Python
 ```
 
 Compile MUI Python wrapper
@@ -59,10 +60,10 @@ where budget_code should be set by the user.
 Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
 
 ```bash
-  . ./fenics2019_eCSE_FSI.conf
+  source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
 ```
 
-The following command should be used to compile the Python wrapper.
+The following command should be used to compile the Python wrapper. It will take about 13min-15min to finish.
 
 ```bash
   srun --distribution=block:block --hint=nomultithread make COMPILER=GNU package
@@ -83,7 +84,7 @@ After the pip installation of the Python wrapper, we now exit from the interacti
 Compile MUI C wrapper
 ---------------------------------------------
 ```bash
-  cd ${BUILD_DIR}/V1.1.3/wrappers/C
+  cd ${BUILD_DIR_MUI}/V1.1.3/wrappers/C
   sed -i '2s/mpicc/cc/' Makefile
   sed -i '3s/mpic++/CC/' Makefile
   sed -i '22s/libmui_c_wrapper.so/libmui_c_wrapper.so mui_c_wrapper_general.o/' Makefile
@@ -96,23 +97,23 @@ Compile MUI C wrapper
 Get MUI Utilities
 ---------------------------------------------
 ```bash
-  cd ${BUILD_DIR}/
+  cd ${BUILD_DIR_MUI}/
   wget https://github.com/MUI-Utilities/MUI_Utilities/archive/refs/heads/main.zip
   unzip main.zip
-  cd ${BUILD_DIR}/MUI_Utilities-main
+  cd ${BUILD_DIR_MUI}/MUI_Utilities-main
 ```
 
 Patch Makefile of MUI Utilities Python wrapper for ARCHER2 installation
 ---------------------------------------------
 ```bash
-  patch_file_util=${BUILD_DIR}/patched-MUI_Utilities-Python-Makefile-FSI
-  cp "${patch_file_util}" ${BUILD_DIR}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python/Makefile
+  patch_file_util=${BUILD_DIR_MUI}/patched-MUI_Utilities-Python-Makefile-FSI
+  cp "${patch_file_util}" ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python/Makefile
 ```
 
 Go to the main folder of MUI Utilities Python wrapper
 ---------------------------------------------
 ```bash
-  cd ${BUILD_DIR}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python
+  cd ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python
 ```
 
 Compile and pip install of MUI Utilities Python wrapper
@@ -125,7 +126,7 @@ make pip-install
 Compile MUI Utilities C wrapper
 ---------------------------------------------
 ```bash
-cd $INSTALL_DIR/MUI_Utilities-main/fsiCouplingLab/wrappers/C
+cd ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/C
 sed -i '4s/=/=..\/..\/..\/..\/V1.1.3/' Makefile_CAPI
 sed -i '9s/-I/-I..\/..\/..\/..\/..\/FEniCS\/V2019.1.0\/eigen-3.3.9\/build\/build\/include\/eigen3/' Makefile_CAPI
 make -f Makefile_CAPI
