@@ -325,19 +325,31 @@ Build python build
   export DOLFIN_DIR=$BUILD_DIR/dolfin/build/share/dolfin/cmake
   python3 setup.py install
 ```
-> ## Note for running
-> 
-> When wanting to use FEniCS and DOLFIN, you will need to run:
->  `source ${INSTALL_FOLDER}/FEniCS/V2019.1.0/dolfin/build/share/dolfin/dolfin.conf`
->
-{. :note}
-===================================================
-#salloc --nodes=1 --tasks-per-node=128 --cpus-per-task=1 --time=00:20:00 --partition=standard --qos=short --reservation=shortqos --account=c01-eng
 
-#srun --distribution=block:block --hint=nomultithread python3 a.py
-===================================================
-#python3 -c "from dolfin import *"
-#python3 -c "from dolfin import VectorFunctionSpace"
-#python3 -c "from dolfin import BoxMesh"
-===================================================
-#rm -r boost/ dolfin/ eigen-3.3.9/ fenics2019_eCSE_FSI/ ffc-2019.1.0.post0/ hdf5-1.10.7/ pybind11-2.6.1/ eigen-3.3.9.tar.gz hdf5-1.10.7.tar.gz v2.6.1.tar.gz
+Test the installation
+---------------------------------------
+
+Because the suite of software is installed for the compute nodes, some tests are carried out using an interactive session on ARCHER2. An example of how to set up such a session is provided here, but more information is available in ARCHER2 documentation pages. The following command is typed from a terminal session:
+
+```bash
+salloc --nodes=1 --tasks-per-node=128 --cpus-per-task=1 --time=00:20:00 --partition=standard --qos=short --reservation=shortqos --account=budget_code
+```
+where budget_code should be set by the user.
+
+Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
+
+```bash
+. ./fenics2019_eCSE_FSI.conf
+```
+
+It might convenient to add it to the .bashrc file.
+
+The first test consists of checking if all the software are properly installed, by using a small piece of code called [a.py](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/a.py), which should be copied to ARCHER2, before running:
+
+```bash
+srun --distribution=block:block --hint=nomultithread python3 a.py
+
+python3 -c "from dolfin import *"
+python3 -c "from dolfin import VectorFunctionSpace"
+python3 -c "from dolfin import BoxMesh"
+```
