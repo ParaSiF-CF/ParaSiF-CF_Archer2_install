@@ -7,7 +7,7 @@ USE_RBF = True
 include $(COMPILER).make
 INC_MPI4PY = -I$(shell python3 -c "import mpi4py;print(mpi4py.get_include())")
 INC_PYBIND = -I/opt/cray/pe/python/3.8.5.0/include/python3.8 -I${INSTALL_FOLDER}/FEniCS/V2019.1.0/pybind11-2.6.1/include -I/opt/cray/pe/python/3.8.5.0/include/python3.8
-INC_MUI = -I${INSTALL_FOLDER}/MUI/MUI-1.1.3
+INC_MUI = -I${INSTALL_FOLDER}/MUI/V1.1.3
 INC_TPARTY =-I${INSTALL_FOLDER}/FEniCS/V2019.1.0/eigen-3.3.9/build/build/include/eigen3
 CC_VERSION_STR = '"$(shell $(CC) --version | head -n 1)"'
 MPI_VERSION_STR = '"$(shell bash mpi_version.sh)"'
