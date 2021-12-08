@@ -1,4 +1,4 @@
-Instructions for compiling Code_Saturne 6.0.6 for ARCHER2
+Instructions for compiling Code_Saturne V6.0.6 for ARCHER2
 ======================================================
 These instructions are for compiling Code_Saturne V6.0.6 on 
 [ARCHER2](https://www.archer2.ac.uk).
@@ -19,7 +19,7 @@ For sake of clarity, Code_Saturne is installed in the same folder as FEniCS (see
   cd $INSTALL_FOLDER
 
   mkdir SATURNE
-  mkdir V6.0.6
+  mkdir SATURNE/V6.0.6
 
   cd SATURNE/V6.0.6
   wget https://www.code-saturne.org/releases/code_saturne-6.0.6.tar.gz
@@ -28,7 +28,7 @@ For sake of clarity, Code_Saturne is installed in the same folder as FEniCS (see
 
 Install the software
 ---------------------------------------------
-For this purpose the filed [InstallHPC.sh](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/Code_Saturne/V6.0.6/InstallHPC.sh) is used. It should be copied under $INSTALL_FOLDER/SATURNE/V6.0.6 on ARCHER2 and run as follows:
+For this purpose the file [InstallHPC.sh](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/Code_Saturne/V6.0.6/InstallHPC.sh) is used. It should be copied under $INSTALL_FOLDER/SATURNE/V6.0.6 on ARCHER2 and run as follows:
 
 ```bash
   chmod 755 ./InstallHPC.sh
@@ -66,3 +66,6 @@ The idea is to test the command $INSTALL_FOLDER/SATURNE/V6.0.6/code_saturne-6.0.
     -h, --help  show this help message and exit
 ```
 
+Activate the link to MUI
+---------------------------------------------
+The instructions to perform this operation are to be found in [Code_Saturne_MUI_Coupling](https://github.com/MUI-Utilities/MUI_Utilities/tree/main/Code_Saturne_MUI_Coupling), which explains that 2 python files of Code_Saturne's distribution (V6.0.6) have to be changed. The 2 files are cs_compile.py and cs_config.py. They have to be updated following the instructions in [Code_Saturne_MUI_Coupling](https://github.com/MUI-Utilities/MUI_Utilities/tree/main/Code_Saturne_MUI_Coupling), and are to be found in the following folder of ARCHER2: $INSTALL_FOLDER/SATURNE/V6.0.6/code_saturne-6.0.6/arch/Linux/lib/python3.8/site-packages/code_saturne.
