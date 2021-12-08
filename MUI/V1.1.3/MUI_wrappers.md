@@ -64,7 +64,7 @@ Before running the tests, some environment variables should be set, and the file
   source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
 ```
 
-The following command should be used to compile the Python wrapper. It could take about 13min-15min to complete.
+The following command should be used to compile the Python wrapper.
 
 ```bash
   srun --distribution=block:block --hint=nomultithread make COMPILER=GNU package
