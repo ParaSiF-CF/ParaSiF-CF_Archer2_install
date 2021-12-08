@@ -131,3 +131,5 @@ Compile MUI Utilities C wrapper
   sed -i '9s/-I/-I..\/..\/..\/..\/..\/FEniCS\/V2019.1.0\/eigen-3.3.9\/build\/build\/include\/eigen3/' Makefile_CAPI
   make -f Makefile_CAPI
 ```
+
+It is possible to check the installation by running some unit tests to be found [here](https://github.com/MxUI/MUI-demo/tree/master/mui4py). The would need to be run on an interactive node of ARCHER2.
