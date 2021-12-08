@@ -3,7 +3,7 @@ Instructions for compiling MUI and MUI utility wrappers for ARCHER2
 
 These instructions are for compiling wrappers of MUI 1.1.3 and MUI_Utilities 
 on [ARCHER2](https://www.archer2.ac.uk).
-wrappers of MUI 1.1.3 and MUI_Utilities are installed with the following software:
+Wrappers of MUI 1.1.3 and MUI_Utilities are installed with the following utilities:
 ```bash
   -GNU: 10.2.0
   -python: 3.8.5
@@ -12,6 +12,8 @@ wrappers of MUI 1.1.3 and MUI_Utilities are installed with the following softwar
 
 Create and set the installation and build folders
 ---------------------------------------------
+For simplicity, MUI is installed in the same INSTALL_FOLDER as FEniCS. Some paths showed below assume this.
+
 ```bash
   export INSTALL_FOLDER=`pwd`
   mkdir ${INSTALL_FOLDER}/MUI
@@ -21,6 +23,8 @@ Create and set the installation and build folders
 
 Source fenics2019_eCSE_FSI.conf
 ---------------------------------------------
+If not sourced yet, this file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) needs to be sourced to set up some environment variables.
+
 ```bash
   source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
 ```
@@ -36,46 +40,43 @@ Get MUI V1.1.3
 
 Patch Makefile of MUI Python wrapper for ARCHER2 installation
 ---------------------------------------------
-```bash
-  patch_file=${BUILD_DIR_MUI}/patched-MUI-Python-Makefile-FSI 
-  cp "${patch_file}" ${BUILD_DIR_MUI}/V1.1.3/wrappers/Python/Makefile
-```
+Some extra files are required to continue the installation, as for instance [patched-MUI-Python-Makefile-FSI](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/MUI/patched-MUI-Python-Makefile-FSI), which needs to be copied to ARCHER2 in the ${BUILD_DIR_MUI} directory.
 
-Go to the main folder of MUI Python wrapper
----------------------------------------------
 ```bash
-  cd ${BUILD_DIR_MUI}/V1.1.3/wrappers/Python
+  export patch_file=${BUILD_DIR_MUI}/patched-MUI-Python-Makefile-FSI 
+  cp "${patch_file}" ${BUILD_DIR_MUI}/V1.1.3/wrappers/Python/Makefile
 ```
 
 Compile MUI Python wrapper
 ---------------------------------------------
-In here, due to the large memory required, we need to compile MUI Python wrapper using an interactive session on ARCHER2. An example of how to set up such a session is provided here, but more information is available in ARCHER2 documentation pages. The following command is typed from a terminal session:
+Because of the large memory required, the MUI Python wrapper needs to be compiled in an interactive session of ARCHER2. An example of how to set up such a session is provided here, but more information is available in ARCHER2 documentation pages. The following command is typed from a terminal session:
 
 ```bash
   salloc --nodes=1 --tasks-per-node=1 --cpus-per-task=1 --time=01:00:00 --partition=standard --qos=standard --account=budget_code
+  cd ${BUILD_DIR_MUI}/V1.1.3/wrappers/Python
 ```
 
 where budget_code should be set by the user.
 
-Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
+Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf), if not already available on the machine, should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
 
 ```bash
   source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
 ```
 
-The following command should be used to compile the Python wrapper. It will take about 13min-15min to finish.
+The following command should be used to compile the Python wrapper. It could take about 13min-15min to complete.
 
 ```bash
   srun --distribution=block:block --hint=nomultithread make COMPILER=GNU package
 ```
 
-After compiling, we need to run the following command to install it into the fenics2019_eCSE_FSI virenv
+After compiling, the following command is run to install it into the fenics2019_eCSE_FSI virtualenv.
 
 ```bash
   make pip-install
 ```
 
-After the pip installation of the Python wrapper, we now exit from the interactive session and back to the login node.
+As the pip installation of the Python wrapper is done, the next steps are to exit from the interactive session and go back to the login node.
 
 ```bash
   exit
@@ -83,6 +84,8 @@ After the pip installation of the Python wrapper, we now exit from the interacti
 
 Compile MUI C wrapper
 ---------------------------------------------
+The C wrapper is now built as:
+
 ```bash
   cd ${BUILD_DIR_MUI}/V1.1.3/wrappers/C
   sed -i '2s/mpicc/cc/' Makefile
@@ -96,38 +99,35 @@ Compile MUI C wrapper
 
 Get MUI Utilities
 ---------------------------------------------
+
 ```bash
-  cd ${BUILD_DIR_MUI}/
+  cd ${BUILD_DIR_MUI}
   wget https://github.com/MUI-Utilities/MUI_Utilities/archive/refs/heads/main.zip
   unzip main.zip
-  cd ${BUILD_DIR_MUI}/MUI_Utilities-main
 ```
 
 Patch Makefile of MUI Utilities Python wrapper for ARCHER2 installation
 ---------------------------------------------
-```bash
-  patch_file_util=${BUILD_DIR_MUI}/patched-MUI_Utilities-Python-Makefile-FSI
-  cp "${patch_file_util}" ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python/Makefile
-```
+Another patch is required for the utilities, and the [patched-MUI_Utilities-Python-Makefile-FSI](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/MUI/patched-MUI_Utilities-Python-Makefile-FSI) patch needs to be copied on ARCHER2, in the ${BUILD_DIR_MUI} directory.
 
-Go to the main folder of MUI Utilities Python wrapper
----------------------------------------------
 ```bash
-  cd ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python
+  export patch_file_util=${BUILD_DIR_MUI}/patched-MUI_Utilities-Python-Makefile-FSI
+  cp "${patch_file_util}" ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python/Makefile
 ```
 
 Compile and pip install of MUI Utilities Python wrapper
 ---------------------------------------------
 ```bash
-make package
-make pip-install
+  cd ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/Python
+  make package
+  make pip-install
 ```
 
 Compile MUI Utilities C wrapper
 ---------------------------------------------
 ```bash
-cd ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/C
-sed -i '4s/=/=..\/..\/..\/..\/V1.1.3/' Makefile_CAPI
-sed -i '9s/-I/-I..\/..\/..\/..\/..\/FEniCS\/V2019.1.0\/eigen-3.3.9\/build\/build\/include\/eigen3/' Makefile_CAPI
-make -f Makefile_CAPI
+  cd ${BUILD_DIR_MUI}/MUI_Utilities-main/fsiCouplingLab/wrappers/C
+  sed -i '4s/=/=..\/..\/..\/..\/V1.1.3/' Makefile_CAPI
+  sed -i '9s/-I/-I..\/..\/..\/..\/..\/FEniCS\/V2019.1.0\/eigen-3.3.9\/build\/build\/include\/eigen3/' Makefile_CAPI
+  make -f Makefile_CAPI
 ```
