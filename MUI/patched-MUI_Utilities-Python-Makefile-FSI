@@ -1,4 +1,3 @@
-INSTALL_FOLDER=/work/c01/c01/wendiliu/app_test
 CC	= CC
 CFLAGS	= -Wall -std=c++11 -O3 -fpermissive -fPIC
 LDFLAGS = -shared
