@@ -13,7 +13,7 @@ Code_Saturne V6.0.6 is installed with the following utilities:
 
 Create the build folders and get the distribution
 ---------------------------------------------
-For sake of clarity, Code_Saturne is installed in the same folder as FEniCS (see [FEniCS_2019.1.0.md](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/FEniCS_2019.1.0.md)), and the $INSTALL_FOLDER environment variable is the same as for FEniCS.
+For sake of clarity, Code_Saturne is installed in the same folder as FEniCS (see [FEniCS_2019.1.0.md](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/FEniCS/V2019.1.0/FEniCS_2019.1.0.md)), and the $INSTALL_FOLDER environment variable is the same as for FEniCS.
 
 ```bash
   cd $INSTALL_FOLDER
@@ -28,7 +28,7 @@ For sake of clarity, Code_Saturne is installed in the same folder as FEniCS (see
 
 Install the software
 ---------------------------------------------
-For this purpose the file [InstallHPC.sh](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/Code_Saturne/V6.0.6/InstallHPC.sh) is used. It should be copied under $INSTALL_FOLDER/SATURNE/V6.0.6 on ARCHER2 and run as follows:
+For this purpose the file [InstallHPC.sh](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/Code_Saturne/V6.0.6/InstallHPC.sh) is used. It should be copied under $INSTALL_FOLDER/SATURNE/V6.0.6 on ARCHER2 and run as follows:
 
 ```bash
   chmod 755 ./InstallHPC.sh
