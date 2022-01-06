@@ -23,7 +23,7 @@ For simplicity, MUI is installed in the same INSTALL_FOLDER as FEniCS. Some path
 
 Source fenics2019_eCSE_FSI.conf
 ---------------------------------------------
-If not sourced yet, this file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) needs to be sourced to set up some environment variables.
+If not sourced yet, this file [fenics2019_eCSE_FSI.conf](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) needs to be sourced to set up some environment variables.
 
 ```bash
   source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
@@ -40,7 +40,7 @@ Get MUI V1.1.3
 
 Patch Makefile of MUI Python wrapper for ARCHER2 installation
 ---------------------------------------------
-Some extra files are required to continue the installation, as for instance [patched-MUI-Python-Makefile-FSI](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/MUI/patched-MUI-Python-Makefile-FSI), which needs to be copied to ARCHER2 in the ${BUILD_DIR_MUI} directory.
+Some extra files are required to continue the installation, as for instance [patched-MUI-Python-Makefile-FSI](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/MUI/V1.1.3/patched-MUI-Python-Makefile-FSI), which needs to be copied to ARCHER2 in the ${BUILD_DIR_MUI} directory.
 
 ```bash
   export patch_file=${BUILD_DIR_MUI}/patched-MUI-Python-Makefile-FSI 
@@ -58,7 +58,7 @@ Because of the large memory required, the MUI Python wrapper needs to be compile
 
 where budget_code should be set by the user.
 
-Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf), if not already available on the machine, should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
+Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf), if not already available on the machine, should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
 
 ```bash
   source ${BUILD_DIR_MUI}/../FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf
@@ -108,7 +108,7 @@ Get MUI Utilities
 
 Patch Makefile of MUI Utilities Python wrapper for ARCHER2 installation
 ---------------------------------------------
-Another patch is required for the utilities, and the [patched-MUI_Utilities-Python-Makefile-FSI](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/MUI/patched-MUI_Utilities-Python-Makefile-FSI) patch needs to be copied on ARCHER2, in the ${BUILD_DIR_MUI} directory.
+Another patch is required for the utilities, and the [patched-MUI_Utilities-Python-Makefile-FSI](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/MUI/V1.1.3/patched-MUI_Utilities-Python-Makefile-FSI) patch needs to be copied on ARCHER2, in the ${BUILD_DIR_MUI} directory.
 
 ```bash
   export patch_file_util=${BUILD_DIR_MUI}/patched-MUI_Utilities-Python-Makefile-FSI
