@@ -336,7 +336,7 @@ salloc --nodes=1 --tasks-per-node=128 --cpus-per-task=1 --time=00:20:00 --partit
 ```
 where budget_code should be set by the user.
 
-Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://gitlab.com/Wendi-L/archer2_install/-/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
+Before running the tests, some environment variables should be set, and the file [fenics2019_eCSE_FSI.conf](https://github.com/ParaSiF-CF/ParaSiF-CF_Archer2_install/blob/master/FEniCS/V2019.1.0/fenics2019_eCSE_FSI.conf) should be copied to ARCHER2 and adapted for the current installation, by changing your_own_installation_path in Line 3 (L3) to the actual installation path. It is then sourced as:
 
 ```bash
 . ./fenics2019_eCSE_FSI.conf
